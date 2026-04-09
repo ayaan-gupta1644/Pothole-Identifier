@@ -173,17 +173,3 @@ row,col,cell_x_center,cell_y_center,damage_score
 ```
 
 ---
-
-## Resume / Presentation Talking Points
-
-> *"I extended OpenCV's imgproc module by implementing a `detectPotholeRegions()` function that augments the standard connected-components pipeline with CLAHE-based lighting normalisation, shadow-depth analysis, and a composite severity scoring formula. The system processes real dashcam footage and generates georeferenced damage heatmaps exportable to CSV for municipal road-repair prioritisation."*
-
----
-
-## Potential Improvements (for viva questions)
-
-- Add GPS tagging using EXIF metadata from dashcam footage
-- Integrate with Google Maps API to pin potholes on a real map
-- Train a small CNN as a second-pass false-positive filter
-- Add stereo camera support for actual depth measurement
-- Build a Flask web dashboard to upload and analyse videos
