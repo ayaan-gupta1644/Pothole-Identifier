@@ -33,49 +33,83 @@ pothole_detector/
 
 ---
 
-## How to Build
+## How to Build (Windows)
 
 ### Prerequisites
-```bash
-# Ubuntu / Debian
-sudo apt update && sudo apt install -y libopencv-dev cmake build-essential
 
-# macOS
-brew install opencv cmake
+**1. Install Visual Studio 2019 or 2022**
+Download from https://visualstudio.microsoft.com/
+During install, select **"Desktop development with C++"** workload.
+
+**2. Install CMake**
+Download from https://cmake.org/download/ — pick the Windows `.msi` installer.
+✅ Tick **"Add CMake to system PATH"** during install.
+
+**3. Install OpenCV**
+- Go to https://opencv.org/releases/ and download the latest **Windows** `.exe`
+- Run it — it self-extracts to `C:\opencv` by default
+- That's it, no compilation needed (pre-built binaries included)
+
+---
+
+### Build (One-Click)
+
+```
+Double-click  build_windows.bat
 ```
 
-### Build Steps
-```bash
-git clone <your-repo>
+That's literally it. The script will:
+1. Find your OpenCV at `C:\opencv\build`
+2. Auto-detect Visual Studio version
+3. Run CMake + MSBuild in Release mode
+4. Copy all required OpenCV `.dll` files next to the `.exe`
+
+**If your OpenCV is NOT at `C:\opencv`**, open `build_windows.bat` in Notepad and change this line:
+```bat
+set OpenCV_DIR=C:\opencv\build
+```
+
+---
+
+### Build (Manual — if you prefer)
+
+Open **Developer Command Prompt for VS** (search in Start menu), then:
+
+```bat
 cd pothole_detector
-
-mkdir build && cd build
-cmake ..
-make -j4
-
-# Binary will be at: build/pothole_detector
+mkdir build
+cd build
+cmake .. -G "Visual Studio 17 2022" -A x64 -DOpenCV_DIR="C:\opencv\build"
+cmake --build . --config Release
 ```
+
+Exe will be at: `build\Release\pothole_detector.exe`
 
 ---
 
 ## How to Run
 
-```bash
-# On a dashcam video
-./pothole_detector --video road.mp4
+Open **Command Prompt** or **PowerShell** in the project folder:
 
-# On your laptop camera
-./pothole_detector --camera 0
+```bat
+REM On a dashcam video
+build\Release\pothole_detector.exe --video road.mp4
 
-# On a single image
-./pothole_detector --image road.jpg
+REM On your laptop webcam
+build\Release\pothole_detector.exe --camera 0
 
-# Save annotated output video
-./pothole_detector --video road.mp4 --save output_annotated.mp4
+REM On a single image
+build\Release\pothole_detector.exe --image road.jpg
 
-# Tune sensitivity (default minArea=300, lower = detect smaller potholes)
-./pothole_detector --video road.mp4 --minarea 150
+REM Save annotated output video
+build\Release\pothole_detector.exe --video road.mp4 --save output_annotated.mp4
+
+REM Tune sensitivity (default minArea=300, lower = detect smaller potholes)
+build\Release\pothole_detector.exe --video road.mp4 --minarea 150
 ```
+
+> **Tip:** If you get a `VCRUNTIME140.dll not found` error, install the
+> [Visual C++ Redistributable](https://aka.ms/vs/17/release/vc_redist.x64.exe).
 
 ---
 
@@ -139,3 +173,17 @@ row,col,cell_x_center,cell_y_center,damage_score
 ```
 
 ---
+
+## Resume / Presentation Talking Points
+
+> *"I extended OpenCV's imgproc module by implementing a `detectPotholeRegions()` function that augments the standard connected-components pipeline with CLAHE-based lighting normalisation, shadow-depth analysis, and a composite severity scoring formula. The system processes real dashcam footage and generates georeferenced damage heatmaps exportable to CSV for municipal road-repair prioritisation."*
+
+---
+
+## Potential Improvements (for viva questions)
+
+- Add GPS tagging using EXIF metadata from dashcam footage
+- Integrate with Google Maps API to pin potholes on a real map
+- Train a small CNN as a second-pass false-positive filter
+- Add stereo camera support for actual depth measurement
+- Build a Flask web dashboard to upload and analyse videos
